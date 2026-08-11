@@ -3,7 +3,6 @@ const LAST_CAPTURE_KEY = "netease_music_last_capture";
 const LAST_RESULT_KEY = "netease_music_last_result";
 const CAPTURE_COMPLETE_KEY = "netease_music_capture_complete";
 const CAPTURE_LOCK_KEY = "netease_music_capture_in_progress";
-const NOTIFY_CAPTURE = "{{{NOTIFY_CAPTURE}}}" !== "false";
 const ACCOUNT_URL = "https://music.163.com/api/nuser/account/get";
 const SIGN_URL = "https://music.163.com/api/point/dailyTask";
 const USER_AGENT = "Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 Mobile/15E148";
@@ -81,14 +80,6 @@ async function captureCookie(ctx) {
     ctx.storage.setJSON(LAST_RESULT_KEY, captureResult);
     ctx.storage.set(CAPTURE_COMPLETE_KEY, "true");
     console.log(`网易云账号 ${account.name} Cookie ${previous === cookie ? "无变化" : "已保存"}，后续抓取已静默跳过，当前共 ${captureResult.accounts} 个账号`);
-    if (NOTIFY_CAPTURE) {
-      ctx.notify({
-        title: "网易云 Cookie 已获取",
-        subtitle: account.name,
-        body: `验证成功，后续抓取已静默跳过。当前已保存 ${captureResult.accounts} 个账号，每日 00:10 自动签到。`,
-        sound: true, duration: 6,
-      });
-    }
   } finally {
     ctx.storage.remove(CAPTURE_LOCK_KEY);
   }
