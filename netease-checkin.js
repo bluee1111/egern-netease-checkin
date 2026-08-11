@@ -1,6 +1,7 @@
 const ACCOUNTS_KEY = "netease_music_accounts";
 const LAST_CAPTURE_KEY = "netease_music_last_capture";
 const LAST_RESULT_KEY = "netease_music_last_result";
+const NOTIFY_CAPTURE = "{{{NOTIFY_CAPTURE}}}" !== "false";
 const ACCOUNT_URL = "https://music.163.com/api/nuser/account/get";
 const SIGN_URL = "https://music.163.com/api/point/dailyTask";
 const USER_AGENT = "Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 Mobile/15E148";
@@ -65,12 +66,21 @@ async function captureCookie(ctx) {
   ctx.storage.setJSON(ACCOUNTS_KEY, accounts);
 
   const captured = ctx.storage.getJSON(LAST_CAPTURE_KEY) || {};
-  const changed = captured[account.id] !== fingerprint(cookie);
   captured[account.id] = fingerprint(cookie);
   ctx.storage.setJSON(LAST_CAPTURE_KEY, captured);
-  console.log(`网易云账号 ${account.name} Cookie ${previous === cookie ? "无变化" : "已保存"}`);
-  if (changed) {
-    ctx.notify({ title: "网易云音乐签到", subtitle: account.name, body: "Cookie 已保存，已开启每日自动签到", sound: true, duration: 5 });
+  const captureResult = {
+    day: today(), time: new Date().toISOString(), accounts: Object.keys(accounts).length,
+    success: 1, failed: 0, message: `Cookie 已验证：${account.name}`,
+  };
+  ctx.storage.setJSON(LAST_RESULT_KEY, captureResult);
+  console.log(`网易云账号 ${account.name} Cookie ${previous === cookie ? "无变化" : "已保存"}，当前共 ${captureResult.accounts} 个账号`);
+  if (NOTIFY_CAPTURE) {
+    ctx.notify({
+      title: "网易云 Cookie 已获取",
+      subtitle: account.name,
+      body: `验证成功，当前已保存 ${captureResult.accounts} 个账号。每日 00:10 自动签到。`,
+      sound: true, duration: 6,
+    });
   }
 }
 
