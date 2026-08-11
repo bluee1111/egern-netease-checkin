@@ -5,11 +5,11 @@ homepage: "https://github.com/buleeee1111/egern-netease-checkin"
 icon: "music.note.list"
 
 compat_arguments:
-  CronExp: "15 8 * * *"
+  CronExp: "10 0 * * *"
 
 compat_arguments_desc: |
   CronExp: 每日签到时间（Cron 表达式）
-  默认 15 8 * * *，即每天 08:15
+  默认 10 0 * * *，即每天 00:10
 
 env_schema:
   ENABLE_CAPTURE:
@@ -31,7 +31,7 @@ scriptings:
   - http_request:
       name: "网易云 Cookie 获取"
       match: "^https:\\/\\/music\\.163\\.com\\/(api\\/nuser\\/account\\/get|api\\/v1\\/user\\/account|api\\/v1\\/playlist)"
-      script_url: "https://raw.githubusercontent.com/buleeee1111/egern-netease-checkin/main/netease-checkin.js?v=1"
+      script_url: "https://raw.githubusercontent.com/buleeee1111/egern-netease-checkin/main/netease-checkin.js?v=2"
       timeout: 30
       update_interval: 86400
       enabled: "{{{ENABLE_CAPTURE}}}"
@@ -39,7 +39,7 @@ scriptings:
   - schedule:
       name: "网易云音乐每日签到"
       cron: "{{{CronExp}}}"
-      script_url: "https://raw.githubusercontent.com/buleeee1111/egern-netease-checkin/main/netease-checkin.js?v=1"
+      script_url: "https://raw.githubusercontent.com/buleeee1111/egern-netease-checkin/main/netease-checkin.js?v=2"
       timeout: 90
       update_interval: 86400
       enabled: "{{{ENABLE_SIGN}}}"
