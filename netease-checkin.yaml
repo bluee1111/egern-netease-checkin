@@ -28,15 +28,8 @@ env_schema:
       - "false"
   NOTIFY_CAPTURE:
     name: "Cookie 获取通知"
-    description: "每次成功验证并保存网易云 Cookie 时发送通知，用于确认抓取状态"
+    description: "首次成功验证并保存网易云 Cookie 时发送通知"
     default_value: "true"
-    options:
-      - "true"
-      - "false"
-  ENABLE_DIAGNOSTIC:
-    name: "诊断通知"
-    description: "临时开启后每 2 分钟发送一次模块运行通知，用完请关闭"
-    default_value: "false"
     options:
       - "true"
       - "false"
@@ -57,14 +50,6 @@ scriptings:
       timeout: 90
       update_interval: 86400
       enabled: "{{{ENABLE_SIGN}}}"
-
-  - schedule:
-      name: "网易云模块诊断"
-      cron: "*/2 * * * *"
-      script_url: "https://raw.githubusercontent.com/buleeee1111/egern-netease-checkin/main/netease-diagnostic.js?v=1"
-      timeout: 30
-      update_interval: 86400
-      enabled: "{{{ENABLE_DIAGNOSTIC}}}"
 
 mitm:
   hostnames:
