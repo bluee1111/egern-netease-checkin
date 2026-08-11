@@ -1,7 +1,8 @@
 const ACCOUNTS_KEY = "netease_music_accounts";
 const LAST_CAPTURE_KEY = "netease_music_last_capture";
 const LAST_RESULT_KEY = "netease_music_last_result";
-const LAST_DIAGNOSTIC_KEY = "netease_music_last_diagnostic";
+const CAPTURE_COMPLETE_KEY = "netease_music_capture_complete";
+const CAPTURE_LOCK_KEY = "netease_music_capture_in_progress";
 const NOTIFY_CAPTURE = "{{{NOTIFY_CAPTURE}}}" !== "false";
 const ACCOUNT_URL = "https://music.163.com/api/nuser/account/get";
 const SIGN_URL = "https://music.163.com/api/point/dailyTask";
@@ -52,48 +53,44 @@ async function accountInfo(ctx, cookie) {
 }
 
 async function captureCookie(ctx) {
-  const cookie = getHeader(ctx.request?.headers, "cookie").trim();
-  if (!/(?:^|;\s*)MUSIC_U=/i.test(cookie)) {
-    const day = today();
-    if (NOTIFY_CAPTURE && ctx.storage.get(LAST_DIAGNOSTIC_KEY) !== day) {
-      ctx.storage.set(LAST_DIAGNOSTIC_KEY, day);
+  if (ctx.storage.get(CAPTURE_COMPLETE_KEY) === "true") return;
+  if (ctx.storage.get(CAPTURE_LOCK_KEY) === "true") return;
+  ctx.storage.set(CAPTURE_LOCK_KEY, "true");
+  try {
+    const cookie = getHeader(ctx.request?.headers, "cookie").trim();
+    if (!/(?:^|;\s*)MUSIC_U=/i.test(cookie)) return;
+    let account;
+    try {
+      account = await accountInfo(ctx, cookie);
+    } catch (error) {
+      console.log(`网易云 Cookie 校验失败：${error.message || error}`);
+      return;
+    }
+    const accounts = ctx.storage.getJSON(ACCOUNTS_KEY) || {};
+    const previous = accounts[account.id]?.cookie || "";
+    accounts[account.id] = { cookie, name: account.name };
+    ctx.storage.setJSON(ACCOUNTS_KEY, accounts);
+
+    const captured = ctx.storage.getJSON(LAST_CAPTURE_KEY) || {};
+    captured[account.id] = fingerprint(cookie);
+    ctx.storage.setJSON(LAST_CAPTURE_KEY, captured);
+    const captureResult = {
+      day: today(), time: new Date().toISOString(), accounts: Object.keys(accounts).length,
+      success: 1, failed: 0, message: `Cookie 已验证：${account.name}`,
+    };
+    ctx.storage.setJSON(LAST_RESULT_KEY, captureResult);
+    ctx.storage.set(CAPTURE_COMPLETE_KEY, "true");
+    console.log(`网易云账号 ${account.name} Cookie ${previous === cookie ? "无变化" : "已保存"}，后续抓取已静默跳过，当前共 ${captureResult.accounts} 个账号`);
+    if (NOTIFY_CAPTURE) {
       ctx.notify({
-        title: "网易云 Cookie 未获取",
-        body: "模块已拦截到网易云请求，但请求未携带 MUSIC_U。请确认 Egern 的 MITM 已信任并重新登录网易云。",
-        sound: true, duration: 7,
+        title: "网易云 Cookie 已获取",
+        subtitle: account.name,
+        body: `验证成功，后续抓取已静默跳过。当前已保存 ${captureResult.accounts} 个账号，每日 00:10 自动签到。`,
+        sound: true, duration: 6,
       });
     }
-    console.log("网易云请求未携带 MUSIC_U，等待登录态请求");
-    return;
-  }
-  let account;
-  try {
-    account = await accountInfo(ctx, cookie);
-  } catch (error) {
-    console.log(`网易云 Cookie 校验失败：${error.message || error}`);
-    return;
-  }
-  const accounts = ctx.storage.getJSON(ACCOUNTS_KEY) || {};
-  const previous = accounts[account.id]?.cookie || "";
-  accounts[account.id] = { cookie, name: account.name };
-  ctx.storage.setJSON(ACCOUNTS_KEY, accounts);
-
-  const captured = ctx.storage.getJSON(LAST_CAPTURE_KEY) || {};
-  captured[account.id] = fingerprint(cookie);
-  ctx.storage.setJSON(LAST_CAPTURE_KEY, captured);
-  const captureResult = {
-    day: today(), time: new Date().toISOString(), accounts: Object.keys(accounts).length,
-    success: 1, failed: 0, message: `Cookie 已验证：${account.name}`,
-  };
-  ctx.storage.setJSON(LAST_RESULT_KEY, captureResult);
-  console.log(`网易云账号 ${account.name} Cookie ${previous === cookie ? "无变化" : "已保存"}，当前共 ${captureResult.accounts} 个账号`);
-  if (NOTIFY_CAPTURE) {
-    ctx.notify({
-      title: "网易云 Cookie 已获取",
-      subtitle: account.name,
-      body: `验证成功，当前已保存 ${captureResult.accounts} 个账号。每日 00:10 自动签到。`,
-      sound: true, duration: 6,
-    });
+  } finally {
+    ctx.storage.remove(CAPTURE_LOCK_KEY);
   }
 }
 
