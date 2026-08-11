@@ -1,6 +1,7 @@
 const ACCOUNTS_KEY = "netease_music_accounts";
 const LAST_CAPTURE_KEY = "netease_music_last_capture";
 const LAST_RESULT_KEY = "netease_music_last_result";
+const LAST_DIAGNOSTIC_KEY = "netease_music_last_diagnostic";
 const NOTIFY_CAPTURE = "{{{NOTIFY_CAPTURE}}}" !== "false";
 const ACCOUNT_URL = "https://music.163.com/api/nuser/account/get";
 const SIGN_URL = "https://music.163.com/api/point/dailyTask";
@@ -52,7 +53,19 @@ async function accountInfo(ctx, cookie) {
 
 async function captureCookie(ctx) {
   const cookie = getHeader(ctx.request?.headers, "cookie").trim();
-  if (!/(?:^|;\s*)MUSIC_U=/i.test(cookie)) return;
+  if (!/(?:^|;\s*)MUSIC_U=/i.test(cookie)) {
+    const day = today();
+    if (NOTIFY_CAPTURE && ctx.storage.get(LAST_DIAGNOSTIC_KEY) !== day) {
+      ctx.storage.set(LAST_DIAGNOSTIC_KEY, day);
+      ctx.notify({
+        title: "网易云 Cookie 未获取",
+        body: "模块已拦截到网易云请求，但请求未携带 MUSIC_U。请确认 Egern 的 MITM 已信任并重新登录网易云。",
+        sound: true, duration: 7,
+      });
+    }
+    console.log("网易云请求未携带 MUSIC_U，等待登录态请求");
+    return;
+  }
   let account;
   try {
     account = await accountInfo(ctx, cookie);
