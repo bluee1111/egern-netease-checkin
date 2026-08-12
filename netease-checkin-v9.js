@@ -29,6 +29,13 @@ function fingerprint(value) {
 }
 
 // 安全读取：旧版本可能写入过非 JSON 脏数据，读不出来就当空处理
+// env 检查宽容：只有明确 "false" 才禁用；{{{...}}} 字面量/空值按开启处理
+function envEnabled(ctx, key) {
+  const raw = String(ctx.env?.[key] ?? "");
+  if (raw === "" || raw.includes("{{{")) return true;
+  return raw === "true";
+}
+
 function safeGetJSON(ctx, key) {
   try {
     const value = ctx.storage.getJSON(key);
@@ -111,10 +118,10 @@ async function accountInfo(ctx, cookie) {
 }
 
 // 捕获钩子：检测到 MUSIC_U 直接保存（不调 API 验证，避免风控导致静默）
-// v7: Cookie 保存/更新一律静默，只写日志不弹通知；签到结果通知保留
+// v10: 恢复捕获通知——首次保存/更新各通知一次（当天去重），签到结果通知保留；env 检查宽容
 async function captureCookie(ctx) {
   try {
-    if (String(ctx.env?.ENABLE_CAPTURE ?? "true") !== "true") {
+    if (!envEnabled(ctx, "ENABLE_CAPTURE")) {
       return;
     }
     if (ctx.storage.get(CAPTURE_COMPLETE_KEY) === today()) return;
@@ -136,14 +143,16 @@ async function captureCookie(ctx) {
         stored["last"] = fp;
         ctx.storage.setJSON(LAST_CAPTURE_KEY, stored);
         ctx.storage.set(CAPTURE_COMPLETE_KEY, today());
-        console.log(`网易云新账号 ${fp} Cookie 已保存，共 ${Object.keys(accounts).length} 个账号（静默，不通知）`);
+        ctx.notify({ title: "网易云音乐签到", body: "Cookie 已保存\n每日 00:10 自动签到", sound: true, duration: 5 });
+        console.log(`网易云新账号 ${fp} Cookie 已保存，共 ${Object.keys(accounts).length} 个账号`);
       } else if (existing[1].cookie !== cookie) {
         accounts[existing[0]].cookie = cookie;
         ctx.storage.setJSON(ACCOUNTS_KEY, accounts);
         stored["last"] = fp;
         ctx.storage.setJSON(LAST_CAPTURE_KEY, stored);
         ctx.storage.set(CAPTURE_COMPLETE_KEY, today());
-        console.log(`网易云账号 ${existing[0]} Cookie 已更新（静默，不通知）`);
+        ctx.notify({ title: "网易云音乐签到", body: "Cookie 已更新\n每日 00:10 自动签到", sound: true, duration: 5 });
+        console.log(`网易云账号 ${existing[0]} Cookie 已更新`);
       }
       // 无变化：完全静默
     } finally {
