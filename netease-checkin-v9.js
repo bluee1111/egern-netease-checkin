@@ -111,8 +111,7 @@ async function accountInfo(ctx, cookie) {
 }
 
 // 捕获钩子：检测到 MUSIC_U 直接保存（不调 API 验证，避免风控导致静默）
-// 按天重置：当天首次保存成功通知一次，当天后续重复静默；次日重新捕获
-// 获取 Cookie 开关关闭时直接静默返回：不抓 Cookie、不发任何 Cookie 通知
+// v7: Cookie 保存/更新一律静默，只写日志不弹通知；签到结果通知保留
 async function captureCookie(ctx) {
   try {
     if (String(ctx.env?.ENABLE_CAPTURE ?? "true") !== "true") {
@@ -137,16 +136,14 @@ async function captureCookie(ctx) {
         stored["last"] = fp;
         ctx.storage.setJSON(LAST_CAPTURE_KEY, stored);
         ctx.storage.set(CAPTURE_COMPLETE_KEY, today());
-        ctx.notify({ title: "网易云音乐签到", body: "Cookie 已保存\n每日 00:10 自动签到", sound: true, duration: 5 });
-        console.log(`网易云新账号 ${fp} Cookie 已保存，共 ${Object.keys(accounts).length} 个账号`);
+        console.log(`网易云新账号 ${fp} Cookie 已保存，共 ${Object.keys(accounts).length} 个账号（静默，不通知）`);
       } else if (existing[1].cookie !== cookie) {
         accounts[existing[0]].cookie = cookie;
         ctx.storage.setJSON(ACCOUNTS_KEY, accounts);
         stored["last"] = fp;
         ctx.storage.setJSON(LAST_CAPTURE_KEY, stored);
         ctx.storage.set(CAPTURE_COMPLETE_KEY, today());
-        ctx.notify({ title: "网易云音乐签到", body: "Cookie 已更新\n每日 00:10 自动签到", sound: true, duration: 5 });
-        console.log(`网易云账号 ${existing[0]} Cookie 已更新`);
+        console.log(`网易云账号 ${existing[0]} Cookie 已更新（静默，不通知）`);
       }
       // 无变化：完全静默
     } finally {
