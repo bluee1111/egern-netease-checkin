@@ -85,20 +85,15 @@ async function captureCookie(ctx) {
   }
 }
 
-async function signOne(ctx, cookie, type) {
-  const data = await requestJson(ctx, `${SIGN_URL}?type=${type}`, {
-    method: "POST", headers: headers(cookie, true), body: `type=${type}`,
+// 每日签到：调用 dailyTask 接口（type=0 移动端签到），成功/重复均视为完成
+async function signAccount(ctx, id, item) {
+  const account = await accountInfo(ctx, item.cookie);
+  const data = await requestJson(ctx, `${SIGN_URL}?type=0`, {
+    method: "POST", headers: headers(item.cookie, true), body: "type=0",
   });
   const message = String(data?.message || data?.msg || "签到成功");
   const ok = data?.code === 200 || /成功|已签到|重复/.test(message);
-  return { ok, message };
-}
-
-async function signAccount(ctx, id, item) {
-  const account = await accountInfo(ctx, item.cookie);
-  const android = await signOne(ctx, item.cookie, 0);
-  const web = await signOne(ctx, item.cookie, 1);
-  return { id, name: account.name, android, web };
+  return { id, name: account.name, ok, message };
 }
 
 async function runSign(ctx) {
@@ -115,16 +110,16 @@ async function runSign(ctx) {
     try { reports.push(await signAccount(ctx, id, item)); }
     catch (error) { reports.push({ id, name: item.name || id, error: error.message || String(error) }); }
   }
-  const success = reports.filter(r => !r.error && r.android.ok && r.web.ok).length;
-  const failures = reports.filter(r => r.error || !r.android.ok || !r.web.ok);
+  const success = reports.filter(r => !r.error && r.ok).length;
+  const failures = reports.filter(r => r.error || !r.ok);
   const lines = reports.map(r => r.error
     ? `${r.name}：${r.error}`
-    : `${r.name}：安卓 ${r.android.message}，Web ${r.web.message}`);
+    : `${r.name}：${r.message}`);
   const result = { day: today(), accounts: reports.length, success, failed: failures.length, message: lines.join("\n") };
   ctx.storage.setJSON(LAST_RESULT_KEY, result);
   ctx.notify({
     title: failures.length ? "网易云音乐签到部分失败" : "网易云音乐签到完成",
-    body: [`账号：${reports.length}`, `双端成功：${success}`, `失败：${failures.length}`, "", ...lines.slice(0, 5)].join("\n"),
+    body: [`账号：${reports.length}`, `成功：${success}`, `失败：${failures.length}`, "", ...lines.slice(0, 5)].join("\n"),
     sound: true, duration: 8,
   });
 }
