@@ -108,9 +108,10 @@ async function accountInfo(ctx, cookie) {
 }
 
 // 捕获钩子：出错只记日志，绝不弹通知（避免刷屏）
+// 按天重置：CAPTURE_COMPLETE_KEY 存当天日期，仅当天静默；次日重新捕获
 async function captureCookie(ctx) {
   try {
-    if (ctx.storage.get(CAPTURE_COMPLETE_KEY) === "true") return;
+    if (ctx.storage.get(CAPTURE_COMPLETE_KEY) === today()) return;
     if (ctx.storage.get(CAPTURE_LOCK_KEY) === "true") return;
     ctx.storage.set(CAPTURE_LOCK_KEY, "true");
     try {
@@ -137,7 +138,7 @@ async function captureCookie(ctx) {
         success: 1, failed: 0, message: `Cookie 已验证：${account.name}`,
       };
       ctx.storage.setJSON(LAST_RESULT_KEY, captureResult);
-      ctx.storage.set(CAPTURE_COMPLETE_KEY, "true");
+      ctx.storage.set(CAPTURE_COMPLETE_KEY, today());
       console.log(`网易云账号 ${account.name} Cookie ${previous === cookie ? "无变化" : "已保存"}，后续抓取已静默跳过，当前共 ${captureResult.accounts} 个账号`);
       // 首次捕获成功发一次通知（之后重复捕获静默，不刷屏）
       if (!prevFingerprint || prevFingerprint !== fingerprint(cookie)) {
