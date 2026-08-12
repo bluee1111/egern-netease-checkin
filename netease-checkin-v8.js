@@ -129,6 +129,7 @@ async function captureCookie(ctx) {
       ctx.storage.setJSON(ACCOUNTS_KEY, accounts);
 
       const captured = safeGetJSON(ctx, LAST_CAPTURE_KEY);
+      const prevFingerprint = captured[account.id] || "";
       captured[account.id] = fingerprint(cookie);
       ctx.storage.setJSON(LAST_CAPTURE_KEY, captured);
       const captureResult = {
@@ -138,6 +139,15 @@ async function captureCookie(ctx) {
       ctx.storage.setJSON(LAST_RESULT_KEY, captureResult);
       ctx.storage.set(CAPTURE_COMPLETE_KEY, "true");
       console.log(`网易云账号 ${account.name} Cookie ${previous === cookie ? "无变化" : "已保存"}，后续抓取已静默跳过，当前共 ${captureResult.accounts} 个账号`);
+      // 首次捕获成功发一次通知（之后重复捕获静默，不刷屏）
+      if (!prevFingerprint || prevFingerprint !== fingerprint(cookie)) {
+        ctx.notify({
+          title: "网易云音乐签到",
+          body: `Cookie 已验证：${account.name}\n每日 00:10 自动签到`,
+          sound: true,
+          duration: 5,
+        });
+      }
     } finally {
       ctx.storage.set(CAPTURE_LOCK_KEY, "");
     }
