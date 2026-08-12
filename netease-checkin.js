@@ -25,6 +25,16 @@ function fingerprint(value) {
   return (hash >>> 0).toString(16);
 }
 
+// 安全读取：旧版本可能写入过非 JSON 脏数据，读不出来就当空处理
+function safeGetJSON(ctx, key) {
+  try {
+    const value = ctx.storage.getJSON(key);
+    return value && typeof value === "object" ? value : {};
+  } catch (_) {
+    return {};
+  }
+}
+
 function headers(cookie, form = false) {
   return {
     Accept: "application/json, text/plain, */*",
@@ -35,12 +45,58 @@ function headers(cookie, form = false) {
   };
 }
 
+function translateHttpError(error) {
+  const raw = String(error?.message || error || "");
+  if (/JSON Parse|Unable to parse JSON|Unexpected identifier|Unexpected token|SyntaxError/i.test(raw)) {
+    return new Error("接口返回了非 JSON 内容，可能是风控页、网络劫持或需要重新登录");
+  }
+  return error instanceof Error ? error : new Error(raw);
+}
+
+// 请求封装：ctx.http 内部会自行解析 JSON，非 JSON 内容会抛解析错误，必须整段包住
 async function requestJson(ctx, url, options = {}) {
-  const response = options.method === "POST"
-    ? await ctx.http.post(url, { timeout: 20000, policy: "DIRECT", headers: options.headers, body: options.body || "" })
-    : await ctx.http.get(url, { timeout: 20000, policy: "DIRECT", headers: options.headers });
-  if (response.status < 200 || response.status >= 300) throw new Error(`HTTP ${response.status}`);
-  return response.json();
+  const method = String(options.method || "GET").toUpperCase();
+  const requestOptions = {
+    timeout: 20000,
+    policy: "DIRECT",
+    headers: options.headers,
+  };
+  if (options.body !== undefined) requestOptions.body = options.body;
+
+  let response;
+  try {
+    response = method === "POST"
+      ? await ctx.http.post(url, requestOptions)
+      : await ctx.http.get(url, requestOptions);
+  } catch (error) {
+    throw translateHttpError(error);
+  }
+
+  if (response && typeof response === "object" && typeof response.status === "number") {
+    if (response.status < 200 || response.status >= 300) {
+      let detail = "";
+      try {
+        const raw = typeof response.text === "function" ? await response.text() : JSON.stringify(response);
+        detail = String(raw || "").replace(/\s+/g, " ").slice(0, 240);
+      } catch (_) {}
+      const path = (() => { try { return new URL(url).pathname; } catch (_) { return "request"; } })();
+      throw new Error(`HTTP ${response.status} ${path}${detail ? `：${detail}` : ""}`);
+    }
+  }
+
+  // 解析 body：兼容“已解析对象 / Response-like / 字符串”三种形态，失败转可读错误
+  try {
+    if (response === undefined || response === null) return {};
+    if (typeof response === "string") return JSON.parse(response);
+    if (typeof response.text === "function") {
+      const raw = await response.text();
+      if (typeof raw === "string" && raw.trim()) return JSON.parse(raw);
+      return {};
+    }
+    return response;
+  } catch (error) {
+    throw translateHttpError(error);
+  }
 }
 
 async function accountInfo(ctx, cookie) {
@@ -51,37 +107,42 @@ async function accountInfo(ctx, cookie) {
   return { id, name: String(profile.nickname || id) };
 }
 
+// 捕获钩子：出错只记日志，绝不弹通知（避免刷屏）
 async function captureCookie(ctx) {
-  if (ctx.storage.get(CAPTURE_COMPLETE_KEY) === "true") return;
-  if (ctx.storage.get(CAPTURE_LOCK_KEY) === "true") return;
-  ctx.storage.set(CAPTURE_LOCK_KEY, "true");
   try {
-    const cookie = getHeader(ctx.request?.headers, "cookie").trim();
-    if (!/(?:^|;\s*)MUSIC_U=/i.test(cookie)) return;
-    let account;
+    if (ctx.storage.get(CAPTURE_COMPLETE_KEY) === "true") return;
+    if (ctx.storage.get(CAPTURE_LOCK_KEY) === "true") return;
+    ctx.storage.set(CAPTURE_LOCK_KEY, "true");
     try {
-      account = await accountInfo(ctx, cookie);
-    } catch (error) {
-      console.log(`网易云 Cookie 校验失败：${error.message || error}`);
-      return;
-    }
-    const accounts = ctx.storage.getJSON(ACCOUNTS_KEY) || {};
-    const previous = accounts[account.id]?.cookie || "";
-    accounts[account.id] = { cookie, name: account.name };
-    ctx.storage.setJSON(ACCOUNTS_KEY, accounts);
+      const cookie = getHeader(ctx.request?.headers, "cookie").trim();
+      if (!/(?:^|;\s*)MUSIC_U=/i.test(cookie)) return;
+      let account;
+      try {
+        account = await accountInfo(ctx, cookie);
+      } catch (error) {
+        console.log(`网易云 Cookie 校验失败：${translateHttpError(error).message}`);
+        return;
+      }
+      const accounts = safeGetJSON(ctx, ACCOUNTS_KEY);
+      const previous = accounts[account.id]?.cookie || "";
+      accounts[account.id] = { cookie, name: account.name };
+      ctx.storage.setJSON(ACCOUNTS_KEY, accounts);
 
-    const captured = ctx.storage.getJSON(LAST_CAPTURE_KEY) || {};
-    captured[account.id] = fingerprint(cookie);
-    ctx.storage.setJSON(LAST_CAPTURE_KEY, captured);
-    const captureResult = {
-      day: today(), time: new Date().toISOString(), accounts: Object.keys(accounts).length,
-      success: 1, failed: 0, message: `Cookie 已验证：${account.name}`,
-    };
-    ctx.storage.setJSON(LAST_RESULT_KEY, captureResult);
-    ctx.storage.set(CAPTURE_COMPLETE_KEY, "true");
-    console.log(`网易云账号 ${account.name} Cookie ${previous === cookie ? "无变化" : "已保存"}，后续抓取已静默跳过，当前共 ${captureResult.accounts} 个账号`);
-  } finally {
-    ctx.storage.remove(CAPTURE_LOCK_KEY);
+      const captured = safeGetJSON(ctx, LAST_CAPTURE_KEY);
+      captured[account.id] = fingerprint(cookie);
+      ctx.storage.setJSON(LAST_CAPTURE_KEY, captured);
+      const captureResult = {
+        day: today(), time: new Date().toISOString(), accounts: Object.keys(accounts).length,
+        success: 1, failed: 0, message: `Cookie 已验证：${account.name}`,
+      };
+      ctx.storage.setJSON(LAST_RESULT_KEY, captureResult);
+      ctx.storage.set(CAPTURE_COMPLETE_KEY, "true");
+      console.log(`网易云账号 ${account.name} Cookie ${previous === cookie ? "无变化" : "已保存"}，后续抓取已静默跳过，当前共 ${captureResult.accounts} 个账号`);
+    } finally {
+      ctx.storage.remove(CAPTURE_LOCK_KEY);
+    }
+  } catch (error) {
+    console.log(`网易云捕获钩子异常（不通知）：${translateHttpError(error).message}`);
   }
 }
 
@@ -97,7 +158,7 @@ async function signAccount(ctx, id, item) {
 }
 
 async function runSign(ctx) {
-  const accounts = ctx.storage.getJSON(ACCOUNTS_KEY) || {};
+  const accounts = safeGetJSON(ctx, ACCOUNTS_KEY);
   const entries = Object.entries(accounts);
   if (!entries.length) {
     const result = { day: today(), accounts: 0, success: 0, failed: 1, message: "没有 Cookie，请打开网易云音乐触发抓取" };
@@ -108,7 +169,7 @@ async function runSign(ctx) {
   const reports = [];
   for (const [id, item] of entries) {
     try { reports.push(await signAccount(ctx, id, item)); }
-    catch (error) { reports.push({ id, name: item.name || id, error: error.message || String(error) }); }
+    catch (error) { reports.push({ id, name: item.name || id, error: translateHttpError(error).message }); }
   }
   const success = reports.filter(r => !r.error && r.ok).length;
   const failures = reports.filter(r => r.error || !r.ok);
@@ -129,7 +190,8 @@ export default async function (ctx) {
     if (ctx.request?.url) return await captureCookie(ctx);
     await runSign(ctx);
   } catch (error) {
-    console.log(`网易云签到异常：${error.stack || error.message || error}`);
-    ctx.notify({ title: "网易云音乐签到异常", body: error.message || String(error), sound: true, duration: 6 });
+    const message = translateHttpError(error).message;
+    console.log(`网易云签到异常：${message}`);
+    ctx.notify({ title: "网易云音乐签到异常", body: message.slice(0, 180), sound: true, duration: 6 });
   }
 }
