@@ -118,7 +118,7 @@ async function accountInfo(ctx, cookie) {
 }
 
 // 捕获钩子：检测到 MUSIC_U 直接保存（不调 API 验证，避免风控导致静默）
-// v10: 恢复捕获通知——首次保存/更新各通知一次（当天去重），签到结果通知保留；env 检查宽容
+// v11: 捕获钩子加诊断日志（区分无Cookie/MUSIC_U缺失/已保存/新保存），定位 eapi 请求不带明文 Cookie 的问题
 async function captureCookie(ctx) {
   try {
     if (!envEnabled(ctx, "ENABLE_CAPTURE")) {
@@ -129,7 +129,16 @@ async function captureCookie(ctx) {
     ctx.storage.set(CAPTURE_LOCK_KEY, "true");
     try {
       const cookie = getHeader(ctx.request?.headers, "cookie").trim();
-      if (!/(?:^|;\s*)MUSIC_U=/i.test(cookie)) return;
+      const reqUrl = (() => { try { return new URL(ctx.request.url).pathname; } catch (_) { return String(ctx.request?.url || "").slice(0, 120); } })();
+      if (!cookie) {
+        console.log(`网易云捕获诊断：${reqUrl} 无 Cookie 头`);
+        return;
+      }
+      if (!/(?:^|;\s*)MUSIC_U=/i.test(cookie)) {
+        console.log(`网易云捕获诊断：${reqUrl} 有 Cookie 但无 MUSIC_U（len=${cookie.length}）`);
+        return;
+      }
+      console.log(`网易云捕获诊断：${reqUrl} 命中 MUSIC_U（len=${cookie.length}）`);
 
       const fp = fingerprint(cookie);
       const accounts = safeGetJSON(ctx, ACCOUNTS_KEY);
