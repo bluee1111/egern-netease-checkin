@@ -15,14 +15,14 @@ scriptings:
   - http_request:
       name: "网易云 Cookie 自动保存"
       match: "^https:\\/\\/(music\\.163\\.com|interface3\\.music\\.163\\.com|interface\\.music\\.163\\.com)\\/"
-      script_url: "https://raw.githubusercontent.com/buleeee1111/egern-netease-checkin/main/netease-checkin-v8.js?v=1"
+      script_url: "https://raw.githubusercontent.com/buleeee1111/egern-netease-checkin/main/netease-checkin-v8.js?v=2"
       timeout: 30
       update_interval: 86400
 
   - schedule:
       name: "网易云音乐每日签到"
       cron: "{{{CronExp}}}"
-      script_url: "https://raw.githubusercontent.com/buleeee1111/egern-netease-checkin/main/netease-checkin-v8.js?v=1"
+      script_url: "https://raw.githubusercontent.com/buleeee1111/egern-netease-checkin/main/netease-checkin-v8.js?v=2"
       timeout: 90
       update_interval: 86400
 
