@@ -139,7 +139,7 @@ async function captureCookie(ctx) {
       ctx.storage.set(CAPTURE_COMPLETE_KEY, "true");
       console.log(`网易云账号 ${account.name} Cookie ${previous === cookie ? "无变化" : "已保存"}，后续抓取已静默跳过，当前共 ${captureResult.accounts} 个账号`);
     } finally {
-      ctx.storage.remove(CAPTURE_LOCK_KEY);
+      ctx.storage.set(CAPTURE_LOCK_KEY, "");
     }
   } catch (error) {
     console.log(`网易云捕获钩子异常（不通知）：${translateHttpError(error).message}`);
