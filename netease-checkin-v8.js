@@ -107,8 +107,8 @@ async function accountInfo(ctx, cookie) {
   return { id, name: String(profile.nickname || id) };
 }
 
-// 捕获钩子：出错只记日志，绝不弹通知（避免刷屏）
-// 按天重置：CAPTURE_COMPLETE_KEY 存当天日期，仅当天静默；次日重新捕获
+// 捕获钩子：检测到 MUSIC_U 直接保存（不调 API 验证，避免风控导致静默）
+// 按天重置：当天首次保存成功通知一次，当天后续重复静默；次日重新捕获
 async function captureCookie(ctx) {
   try {
     if (ctx.storage.get(CAPTURE_COMPLETE_KEY) === today()) return;
@@ -117,38 +117,33 @@ async function captureCookie(ctx) {
     try {
       const cookie = getHeader(ctx.request?.headers, "cookie").trim();
       if (!/(?:^|;\s*)MUSIC_U=/i.test(cookie)) return;
-      let account;
-      try {
-        account = await accountInfo(ctx, cookie);
-      } catch (error) {
-        console.log(`网易云 Cookie 校验失败：${translateHttpError(error).message}`);
-        return;
-      }
-      const accounts = safeGetJSON(ctx, ACCOUNTS_KEY);
-      const previous = accounts[account.id]?.cookie || "";
-      accounts[account.id] = { cookie, name: account.name };
-      ctx.storage.setJSON(ACCOUNTS_KEY, accounts);
 
-      const captured = safeGetJSON(ctx, LAST_CAPTURE_KEY);
-      const prevFingerprint = captured[account.id] || "";
-      captured[account.id] = fingerprint(cookie);
-      ctx.storage.setJSON(LAST_CAPTURE_KEY, captured);
-      const captureResult = {
-        day: today(), time: new Date().toISOString(), accounts: Object.keys(accounts).length,
-        success: 1, failed: 0, message: `Cookie 已验证：${account.name}`,
-      };
-      ctx.storage.setJSON(LAST_RESULT_KEY, captureResult);
-      ctx.storage.set(CAPTURE_COMPLETE_KEY, today());
-      console.log(`网易云账号 ${account.name} Cookie ${previous === cookie ? "无变化" : "已保存"}，后续抓取已静默跳过，当前共 ${captureResult.accounts} 个账号`);
-      // 首次捕获成功发一次通知（之后重复捕获静默，不刷屏）
-      if (!prevFingerprint || prevFingerprint !== fingerprint(cookie)) {
-        ctx.notify({
-          title: "网易云音乐签到",
-          body: `Cookie 已验证：${account.name}\n每日 00:10 自动签到`,
-          sound: true,
-          duration: 5,
-        });
+      const fp = fingerprint(cookie);
+      const accounts = safeGetJSON(ctx, ACCOUNTS_KEY);
+      const stored = ctx.storage.getJSON(LAST_CAPTURE_KEY) || {};
+      const prevFp = stored["last"] || "";
+      const existing = Object.entries(accounts).find(([, v]) => fingerprint(v.cookie) === fp);
+
+      if (!existing) {
+        // 新账号
+        accounts[fp] = { cookie, name: `账号${Object.keys(accounts).length + 1}` };
+        ctx.storage.setJSON(ACCOUNTS_KEY, accounts);
+        stored["last"] = fp;
+        ctx.storage.setJSON(LAST_CAPTURE_KEY, stored);
+        ctx.storage.set(CAPTURE_COMPLETE_KEY, today());
+        ctx.notify({ title: "网易云音乐签到", body: "Cookie 已保存\n每日 00:10 自动签到", sound: true, duration: 5 });
+        console.log(`网易云新账号 ${fp} Cookie 已保存，共 ${Object.keys(accounts).length} 个账号`);
+      } else if (existing[1].cookie !== cookie) {
+        // Cookie 更新
+        accounts[existing[0]].cookie = cookie;
+        ctx.storage.setJSON(ACCOUNTS_KEY, accounts);
+        stored["last"] = fp;
+        ctx.storage.setJSON(LAST_CAPTURE_KEY, stored);
+        ctx.storage.set(CAPTURE_COMPLETE_KEY, today());
+        ctx.notify({ title: "网易云音乐签到", body: "Cookie 已更新\n每日 00:10 自动签到", sound: true, duration: 5 });
+        console.log(`网易云账号 ${existing[0]} Cookie 已更新`);
       }
+      // 无变化：完全静默
     } finally {
       ctx.storage.set(CAPTURE_LOCK_KEY, "");
     }
