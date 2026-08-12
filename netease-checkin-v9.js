@@ -118,7 +118,7 @@ async function accountInfo(ctx, cookie) {
 }
 
 // 捕获钩子：检测到 MUSIC_U 直接保存（不调 API 验证，避免风控导致静默）
-// v11: 捕获钩子加诊断日志（区分无Cookie/MUSIC_U缺失/已保存/新保存），定位 eapi 请求不带明文 Cookie 的问题
+// v12: 无变化但当天未确认时也发「Cookie 已确认」通知（一天一次）；诊断日志保留
 async function captureCookie(ctx) {
   try {
     if (!envEnabled(ctx, "ENABLE_CAPTURE")) {
@@ -162,8 +162,11 @@ async function captureCookie(ctx) {
         ctx.storage.set(CAPTURE_COMPLETE_KEY, today());
         ctx.notify({ title: "网易云音乐签到", body: "Cookie 已更新\n每日 00:10 自动签到", sound: true, duration: 5 });
         console.log(`网易云账号 ${existing[0]} Cookie 已更新`);
+      } else {
+        ctx.storage.set(CAPTURE_COMPLETE_KEY, today());
+        ctx.notify({ title: "网易云音乐签到", body: "Cookie 已确认\n每日 00:10 自动签到", sound: true, duration: 5 });
+        console.log(`网易云账号 ${fp} Cookie 无变化，已发确认通知`);
       }
-      // 无变化：完全静默
     } finally {
       ctx.storage.set(CAPTURE_LOCK_KEY, "");
     }
