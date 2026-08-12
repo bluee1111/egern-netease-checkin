@@ -112,8 +112,12 @@ async function accountInfo(ctx, cookie) {
 
 // 捕获钩子：检测到 MUSIC_U 直接保存（不调 API 验证，避免风控导致静默）
 // 按天重置：当天首次保存成功通知一次，当天后续重复静默；次日重新捕获
+// 获取 Cookie 开关关闭时直接静默返回：不抓 Cookie、不发任何 Cookie 通知
 async function captureCookie(ctx) {
   try {
+    if (String(ctx.env?.ENABLE_CAPTURE ?? "true") !== "true") {
+      return;
+    }
     if (ctx.storage.get(CAPTURE_COMPLETE_KEY) === today()) return;
     if (ctx.storage.get(CAPTURE_LOCK_KEY) === "true") return;
     ctx.storage.set(CAPTURE_LOCK_KEY, "true");
