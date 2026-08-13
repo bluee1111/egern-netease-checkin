@@ -1,19 +1,17 @@
 # 网易云音乐直连规则组（Egern / Surge 兼容）
-# 覆盖：主站、云贝中心、登录/接口、播放、CDN 与云贝人机校验
+# 基于 3899/ncmm 当前 EAPI/WEAPI 实现重写
 # 更新：2026-08-14
+#
+# 使用：将此规则集策略指定为 DIRECT；不要再额外添加旧的泛域名规则。
 
-# 云贝中心入口及其边缘网关
+# 云贝中心 H5 与接口网关（App 的 EAPI/WEAPI 请求）
 DOMAIN,y.music.163.com,DIRECT
-DOMAIN,level2.y.music.163.com,DIRECT
+DOMAIN,interface3.music.163.com,DIRECT
+DOMAIN,interface.music.163.com,DIRECT
+DOMAIN,music.163.com,DIRECT
 
-# 网易云网页 / App API（含 interface、interface3、m、y 等子域）
-DOMAIN-SUFFIX,music.163.com,DIRECT
-
-# 歌曲封面与前端静态资源（含 p1/p3/s3/s6 等）
+# 网易云图片、JS、音频 CDN（p1/p3/p4/s1/s3/s6/m804 等）
 DOMAIN-SUFFIX,music.126.net,DIRECT
 
-# 云贝等页面可能调用的网易易盾静态/人机校验域名
-DOMAIN,acstatic-dun.126.net,DIRECT
-
-# 播放与游戏化接口
+# 网易云播放/游戏化接口
 DOMAIN-SUFFIX,iplay.163.com,DIRECT
