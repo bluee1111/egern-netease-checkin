@@ -175,10 +175,11 @@ async function captureCookie(ctx) {
   }
 }
 
-// 判断响应是否"成功/已做过"：code===200 或关键词命中
+// 判断响应是否"成功/已做过"：code===200 且无"不支持/未登录/失效"等假成功提示，或关键词命中
 function isDone(data, extraKeys = []) {
   const msg = String(data?.message || data?.msg || data?.error || "");
-  return data?.code === 200 || /成功|已签到|已签|重复|已领取|已完成|已打卡|明天再来/.test(msg);
+  const fake = /暂不支持|不支持|未登录|请登录|已失效|失败|异常|错误/.test(msg);
+  return (!fake && data?.code === 200) || /成功|已签到|已签|重复|已领取|已完成|已打卡|明天再来/.test(msg);
 }
 
 // 积分签到（保留原逻辑）
@@ -204,15 +205,20 @@ async function signVipGrowth(ctx, cookie) {
   const list = await requestJson(ctx, VIP_TASK_LIST_URL, {
     method: "POST", headers: headers(cookie, true), body: "",
   });
-  // 任务列表里找可领取的任务 id
+  // 任务列表里找可领取的任务 id（接口异常时不再假成功）
   const tasks = list?.data?.list || list?.data?.tasks || list?.list || list?.tasks || [];
   const ids = [];
   for (const t of tasks) {
     const tid = t?.id || t?.taskId || t?.task_id || t?.userTaskId;
-    const canGet = t?.status === 1 || t?.canReceive || t?.can_receive || t?.rewardStatus === 0 || t?.done === false;
-    if (tid !== undefined && tid !== null) ids.push(String(tid));
+    const canGet = t?.status === 1 || t?.canReceive || t?.can_receive || t?.rewardStatus === 0 || t?.done === false || t?.finish === true;
+    if (tid !== undefined && tid !== null && canGet) ids.push(String(tid));
   }
   if (!ids.length) {
+    const listMsg = String(list?.message || list?.msg || "");
+    const listFake = /暂不支持|未登录|请登录|已失效|失败|异常/.test(listMsg);
+    if (listFake || !list || list.code !== 200) {
+      return { ok: false, msg: "成长值任务列表获取失败" + (listMsg ? "：" + listMsg : "") };
+    }
     return { ok: true, msg: "成长值任务：无可领取项或已全部完成" };
   }
   const data = await requestJson(ctx, VIP_TASK_REWARD_URL, {
