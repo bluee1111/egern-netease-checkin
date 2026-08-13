@@ -1,20 +1,48 @@
-# 国内抖音直连规则组（Egern / Surge 兼容）
-# 作用：抖音 App、网页版、直播、图片与视频 CDN 走 DIRECT
-# 不包含 TikTok 国际版域名
+# 国内抖音直连规则组（Egern / Surge）
+# 来源：LM-Firefly/Rules 的“抖音”专属分段，完整转换为 DIRECT
+# 不含 TikTok、头条、豆包、飞书等其它字节产品
+# 更新：2026-08-14
 
-DOMAIN-SUFFIX,douyin.com,DIRECT
-DOMAIN-SUFFIX,douyinvod.com,DIRECT
-DOMAIN-SUFFIX,douyinstatic.com,DIRECT
-DOMAIN-SUFFIX,douyincdn.com,DIRECT
-DOMAIN-SUFFIX,iesdouyin.com,DIRECT
-DOMAIN-SUFFIX,amemv.com,DIRECT
-DOMAIN-SUFFIX,byteimg.com,DIRECT
+DOMAIN-SUFFIX,bdxiguavod.com,DIRECT
 DOMAIN-SUFFIX,bytecdn.cn,DIRECT
+DOMAIN-SUFFIX,bytecdntp.com,DIRECT
+DOMAIN-SUFFIX,byted-static.com,DIRECT
+DOMAIN-SUFFIX,bytedance.com,DIRECT
 DOMAIN-SUFFIX,bytedance.net,DIRECT
+DOMAIN-SUFFIX,bytedns.net,DIRECT
+DOMAIN-SUFFIX,bytednsdoc.com,DIRECT
+DOMAIN-SUFFIX,byteeffecttos.com,DIRECT
 DOMAIN-SUFFIX,bytegecko.com,DIRECT
-DOMAIN-SUFFIX,bytegoofy.com,DIRECT
-DOMAIN-SUFFIX,ibytedtos.com,DIRECT
-DOMAIN-SUFFIX,ibytedapm.com,DIRECT
-DOMAIN-SUFFIX,snssdk.com,DIRECT
-DOMAIN-SUFFIX,volces.com,DIRECT
-DOMAIN-SUFFIX,volcengine.com,DIRECT
+DOMAIN-SUFFIX,byteimg.com,DIRECT
+DOMAIN-SUFFIX,bytemaimg.com,DIRECT
+DOMAIN-SUFFIX,bytetcc.com,DIRECT
+DOMAIN-SUFFIX,bytexservice.com,DIRECT
+DOMAIN-SUFFIX,douyin.com,DIRECT
+DOMAIN-SUFFIX,douyinact.com,DIRECT
+DOMAIN-SUFFIX,douyinact.net,DIRECT
+DOMAIN-SUFFIX,douyincdn.com,DIRECT
+DOMAIN-SUFFIX,douyinclips.com,DIRECT
+DOMAIN-SUFFIX,douyinhanyu.com,DIRECT
+DOMAIN-SUFFIX,douyinliving.com,DIRECT
+DOMAIN-SUFFIX,douyinmusicclips.com,DIRECT
+DOMAIN-SUFFIX,douyinmusicvideo.com,DIRECT
+DOMAIN-SUFFIX,douyinpic.com,DIRECT
+DOMAIN-SUFFIX,douyinshortvideo.com,DIRECT
+DOMAIN-SUFFIX,douyinstatic.com,DIRECT
+DOMAIN-SUFFIX,douyinvideo.net,DIRECT
+DOMAIN-SUFFIX,douyinvod.com,DIRECT
+DOMAIN-SUFFIX,dymusictape.com,DIRECT
+DOMAIN-SUFFIX,dymusicvideo.com,DIRECT
+DOMAIN-SUFFIX,dyshortvideo.com,DIRECT
+DOMAIN-SUFFIX,dyvideotape.com,DIRECT
+DOMAIN-SUFFIX,huaxiong.com,DIRECT
+DOMAIN-SUFFIX,idouyinpic.com,DIRECT
+DOMAIN-SUFFIX,idouyinstatic.com,DIRECT
+DOMAIN-SUFFIX,idouyinvod.com,DIRECT
+DOMAIN-SUFFIX,iesdouyin.com,DIRECT
+DOMAIN-SUFFIX,iesdouyin.net,DIRECT
+DOMAIN-SUFFIX,ndcpp.com,DIRECT
+DOMAIN-SUFFIX,pstatp.com,DIRECT
+DOMAIN-SUFFIX,zijiecdn.com,DIRECT
+DOMAIN-SUFFIX,zijiecdn.net,DIRECT
+DOMAIN-SUFFIX,zjcdn.com,DIRECT
