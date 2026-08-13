@@ -118,6 +118,7 @@ async function accountInfo(ctx, cookie) {
 }
 
 // 捕获钩子：检测到 MUSIC_U 直接保存（不调 API 验证，避免风控导致静默）
+// v13: 修复假成功——code200但msg含"暂不支持/未登录/失效"不再判成功；成长值任务列表接口异常/为空不再误报ok
 // v12: 无变化但当天未确认时也发「Cookie 已确认」通知（一天一次）；诊断日志保留
 async function captureCookie(ctx) {
   try {
