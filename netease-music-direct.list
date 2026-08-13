@@ -1,7 +1,15 @@
 # 网易云音乐直连规则组（Egern / Surge 兼容）
-# 更新：2026-08-12
-# 作用：网易云音乐 App、网页、播放与接口请求走 DIRECT
+# 覆盖：主站、云贝中心、登录/接口、播放、CDN 静态资源
+# 更新：2026-08-14
 
+# 云贝中心入口（显式写出，便于核对）
+DOMAIN,y.music.163.com,DIRECT
+
+# 网易云网页 / App API（含 interface、interface3、m、y 等子域）
 DOMAIN-SUFFIX,music.163.com,DIRECT
+
+# 歌曲封面与前端静态资源（含 p1/p3/s3/s6 等）
 DOMAIN-SUFFIX,music.126.net,DIRECT
+
+# 播放与游戏化接口
 DOMAIN-SUFFIX,iplay.163.com,DIRECT
