@@ -1,28 +1,58 @@
 # 国内抖音直连规则组（Egern / Surge）
-# 完整覆盖：抖音 App、网页版、直播、CDN、字节系基础设施
-# 不含 TikTok、头条、豆包、飞书等其它字节产品
+# 来源：blackmatrix7/ios_rule_script ByteDance 规则，筛选抖音相关域名
+# 覆盖：抖音 App、网页版、直播、电商、CDN、字节系基础设施
+# 不含：头条、飞书、西瓜、豆包等其它字节产品
 # 更新：2026-08-14
+DOMAIN-SUFFIX,amemv.cn,DIRECT
 DOMAIN-SUFFIX,amemv.com,DIRECT
+DOMAIN-SUFFIX,amemv.net,DIRECT
+DOMAIN-SUFFIX,bdactivity.com,DIRECT
+DOMAIN-SUFFIX,bdgslb.com,DIRECT
+DOMAIN-SUFFIX,bdxiguaimg.com,DIRECT
+DOMAIN-SUFFIX,bdxiguastatic.com,DIRECT
 DOMAIN-SUFFIX,bdxiguavod.com,DIRECT
+DOMAIN-SUFFIX,byteac.com,DIRECT
+DOMAIN-SUFFIX,byteactivity.com,DIRECT
+DOMAIN-SUFFIX,byteapk.cn,DIRECT
+DOMAIN-SUFFIX,byteapk.com,DIRECT
 DOMAIN-SUFFIX,bytecdn.cn,DIRECT
+DOMAIN-SUFFIX,bytecdn.com,DIRECT
 DOMAIN-SUFFIX,bytecdntp.com,DIRECT
 DOMAIN-SUFFIX,byted-static.com,DIRECT
+DOMAIN-SUFFIX,byted.org,DIRECT
+DOMAIN-SUFFIX,bytedance.cn,DIRECT
 DOMAIN-SUFFIX,bytedance.com,DIRECT
 DOMAIN-SUFFIX,bytedance.net,DIRECT
+DOMAIN-SUFFIX,bytedance.org,DIRECT
+DOMAIN-SUFFIX,bytedanceapi.com,DIRECT
+DOMAIN-SUFFIX,bytedanceoss.net,DIRECT
+DOMAIN-SUFFIX,bytedancevod.com,DIRECT
 DOMAIN-SUFFIX,bytedns.net,DIRECT
+DOMAIN-SUFFIX,bytedns1.com,DIRECT
+DOMAIN-SUFFIX,bytedns2.com,DIRECT
 DOMAIN-SUFFIX,bytednsdoc.com,DIRECT
 DOMAIN-SUFFIX,byteeffecttos.com,DIRECT
+DOMAIN-SUFFIX,bytefcdn.com,DIRECT
+DOMAIN-SUFFIX,bytefcdnrd.com,DIRECT
 DOMAIN-SUFFIX,bytegecko.com,DIRECT
 DOMAIN-SUFFIX,bytegoofy.com,DIRECT
+DOMAIN-SUFFIX,bytegslb.com,DIRECT
 DOMAIN-SUFFIX,byteimg.com,DIRECT
+DOMAIN-SUFFIX,bytelb.net,DIRECT
 DOMAIN-SUFFIX,bytemaimg.com,DIRECT
+DOMAIN-SUFFIX,bytesyscdn.com,DIRECT
 DOMAIN-SUFFIX,bytetcc.com,DIRECT
+DOMAIN-SUFFIX,bytetos.com,DIRECT
+DOMAIN-SUFFIX,byteurl.cn,DIRECT
 DOMAIN-SUFFIX,bytexservice.com,DIRECT
+DOMAIN-SUFFIX,cdndns1.com,DIRECT
+DOMAIN-SUFFIX,cdndns2.com,DIRECT
 DOMAIN-SUFFIX,douyin.com,DIRECT
 DOMAIN-SUFFIX,douyinact.com,DIRECT
 DOMAIN-SUFFIX,douyinact.net,DIRECT
 DOMAIN-SUFFIX,douyincdn.com,DIRECT
 DOMAIN-SUFFIX,douyinclips.com,DIRECT
+DOMAIN-SUFFIX,douyinec.com,DIRECT
 DOMAIN-SUFFIX,douyinhanyu.com,DIRECT
 DOMAIN-SUFFIX,douyinliving.com,DIRECT
 DOMAIN-SUFFIX,douyinmusicclips.com,DIRECT
@@ -36,6 +66,10 @@ DOMAIN-SUFFIX,dymusictape.com,DIRECT
 DOMAIN-SUFFIX,dymusicvideo.com,DIRECT
 DOMAIN-SUFFIX,dyshortvideo.com,DIRECT
 DOMAIN-SUFFIX,dyvideotape.com,DIRECT
+DOMAIN-SUFFIX,ecombdapi.com,DIRECT
+DOMAIN-SUFFIX,ecombdimg.com,DIRECT
+DOMAIN-SUFFIX,ecombdstatic.com,DIRECT
+DOMAIN-SUFFIX,ecombdvod.com,DIRECT
 DOMAIN-SUFFIX,huaxiong.com,DIRECT
 DOMAIN-SUFFIX,ibytedapm.com,DIRECT
 DOMAIN-SUFFIX,ibytedtos.com,DIRECT
@@ -44,11 +78,33 @@ DOMAIN-SUFFIX,idouyinstatic.com,DIRECT
 DOMAIN-SUFFIX,idouyinvod.com,DIRECT
 DOMAIN-SUFFIX,iesdouyin.com,DIRECT
 DOMAIN-SUFFIX,iesdouyin.net,DIRECT
+DOMAIN-SUFFIX,kspkg.com,DIRECT
 DOMAIN-SUFFIX,ndcpp.com,DIRECT
+DOMAIN-SUFFIX,oortgslb.com,DIRECT
 DOMAIN-SUFFIX,pstatp.com,DIRECT
 DOMAIN-SUFFIX,snssdk.com,DIRECT
+DOMAIN-SUFFIX,toscdn.com,DIRECT
+DOMAIN-SUFFIX,volccdn.com,DIRECT
 DOMAIN-SUFFIX,volcengine.com,DIRECT
 DOMAIN-SUFFIX,volces.com,DIRECT
+DOMAIN-SUFFIX,zijieapi.com,DIRECT
+DOMAIN-SUFFIX,zijiecdn.cn,DIRECT
 DOMAIN-SUFFIX,zijiecdn.com,DIRECT
 DOMAIN-SUFFIX,zijiecdn.net,DIRECT
+DOMAIN-SUFFIX,zijieimg.cn,DIRECT
+DOMAIN-SUFFIX,zijieimg.com,DIRECT
+DOMAIN-SUFFIX,zijieimg.net,DIRECT
+DOMAIN-SUFFIX,zijieurl.cn,DIRECT
+DOMAIN-SUFFIX,zijieurl.com,DIRECT
+DOMAIN-SUFFIX,zijieurl.net,DIRECT
+DOMAIN-SUFFIX,zijiewap.cn,DIRECT
+DOMAIN-SUFFIX,zijiewap.com,DIRECT
+DOMAIN-SUFFIX,zijiewap.net,DIRECT
+DOMAIN-SUFFIX,zjbyte.cn,DIRECT
+DOMAIN-SUFFIX,zjbyte.com,DIRECT
+DOMAIN-SUFFIX,zjbyte.net,DIRECT
 DOMAIN-SUFFIX,zjcdn.com,DIRECT
+DOMAIN-SUFFIX,zjgslb.com,DIRECT
+DOMAIN-SUFFIX,zjurl.cn,DIRECT
+DOMAIN,lf3-static.bytednsdoc.com,DIRECT
+DOMAIN,v5-dy-o-abtest.zjcdn.com,DIRECT
