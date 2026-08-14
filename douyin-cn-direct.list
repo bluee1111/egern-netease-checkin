@@ -1,8 +1,12 @@
 # 国内抖音直连规则组（Egern / Surge）
-# 来源：blackmatrix7/ios_rule_script ByteDance 规则，筛选抖音相关域名
+# 来源：blackmatrix7/ios_rule_script ByteDance 规则 + 实测补充
 # 覆盖：抖音 App、网页版、直播、电商、CDN、字节系基础设施
 # 不含：头条、飞书、西瓜、豆包等其它字节产品
 # 更新：2026-08-14
+
+# ===== 域名规则 =====
+DOMAIN,lf3-static.bytednsdoc.com,DIRECT
+DOMAIN,v5-dy-o-abtest.zjcdn.com,DIRECT
 DOMAIN-SUFFIX,amemv.cn,DIRECT
 DOMAIN-SUFFIX,amemv.com,DIRECT
 DOMAIN-SUFFIX,amemv.net,DIRECT
@@ -47,6 +51,7 @@ DOMAIN-SUFFIX,byteurl.cn,DIRECT
 DOMAIN-SUFFIX,bytexservice.com,DIRECT
 DOMAIN-SUFFIX,cdndns1.com,DIRECT
 DOMAIN-SUFFIX,cdndns2.com,DIRECT
+DOMAIN-SUFFIX,dahhxxttxs.com,DIRECT
 DOMAIN-SUFFIX,douyin.com,DIRECT
 DOMAIN-SUFFIX,douyinact.com,DIRECT
 DOMAIN-SUFFIX,douyinact.net,DIRECT
@@ -106,5 +111,3 @@ DOMAIN-SUFFIX,zjbyte.net,DIRECT
 DOMAIN-SUFFIX,zjcdn.com,DIRECT
 DOMAIN-SUFFIX,zjgslb.com,DIRECT
 DOMAIN-SUFFIX,zjurl.cn,DIRECT
-DOMAIN,lf3-static.bytednsdoc.com,DIRECT
-DOMAIN,v5-dy-o-abtest.zjcdn.com,DIRECT
