@@ -1066,9 +1066,9 @@ pupumarket=type=http-response,pattern=^https?:\/\/j1\.pupuapi\.com\/client\/mark
 
 QuDa=type=http-response,pattern=^https?:\/\/iqushangwang\.8quan\.com\/index\.php\/i\/index\/index,requires-body=1,script-path=https://raw.githubusercontent.com/fmz200/wool_scripts/main/Scripts/QuDa.js
 
-netease.adblock=type=http-response,pattern=^https?:\/\/interface(\d)?\.music\.163\.com\/e?api\/yunbei\/account\/entrance\/get,requires-body=1,script-path=https://gist.githubusercontent.com/ddgksf2013/4f53b7c6083678df25fecc8ff68b52c4/raw/netease.adblock.js
+# REMOVED: netease.adblock=type=http-response,pattern=^https?:\/\/interface(\d)?\.music\.163\.com\/e?api\/yunbei\/account\/entrance\/get,requires-body=1,script-path=https://gist.githubusercontent.com/ddgksf2013/4f53b7c6083678df25fecc8ff68b52c4/raw/netease.adblock.js
 
-netease.adblock2=type=http-response,pattern=^https?:\/\/interface(\d)?\.music\.163\.com\/e?api\/vipnewcenter\/app\/resource\/newaccountpage,requires-body=1,script-path=https://gist.githubusercontent.com/ddgksf2013/4f53b7c6083678df25fecc8ff68b52c4/raw/netease.adblock.js
+# REMOVED: netease.adblock2=type=http-response,pattern=^https?:\/\/interface(\d)?\.music\.163\.com\/e?api\/vipnewcenter\/app\/resource\/newaccountpage,requires-body=1,script-path=https://gist.githubusercontent.com/ddgksf2013/4f53b7c6083678df25fecc8ff68b52c4/raw/netease.adblock.js
 
 netease.adblock3=type=http-response,pattern=^https?:\/\/interface(\d)?\.music\.163\.com\/e?api\/vip\/cashier\/tspopup\/get,requires-body=1,script-path=https://gist.githubusercontent.com/ddgksf2013/4f53b7c6083678df25fecc8ff68b52c4/raw/netease.adblock.js
 
@@ -1623,7 +1623,7 @@ hostname = %APPEND% *-release.wuta-cam.com,*.1rtb.net,*.58cdn.com.cn,*.5eplay.co
 [Map Local]
 https?:\/\/res\.xiaojukeji\.com\/resapi\/activity\/get(Ruled|Preload|PasMultiNotices) data="https://raw.githubusercontent.com/deezertidal/Surge_Module/master/files/reject-200.txt"
 https?:\/\/m\.sd\.10086\.cn\/zapi\/app_common\/homeWelcome\/welcome.do data="https://raw.githubusercontent.com/deezertidal/Surge_Module/master/files/reject-200.txt"
-https?:\/\/interface\d?\.music\.163\.com\/w?e?api\/(side-bar\/mini-program\/music-service\/account|delivery\/(batch-deliver|deliver)|moment\/tab\/info\/get|yunbei\/account\/entrance\/get) data="https://raw.githubusercontent.com/deezertidal/Surge_Module/master/files/reject-dict.json"
+# REMOVED: https?:\/\/interface\d?\.music\.163\.com\/w?e?api\/(side-bar\/mini-program\/music-service\/account|delivery\/(batch-deliver|deliver)|moment\/tab\/info\/get|yunbei\/account\/entrance\/get) data="https://raw.githubusercontent.com/deezertidal/Surge_Module/master/files/reject-dict.json"
 https?:\/\/interface\d?\.music\.163\.com\/eapi\/(resource\/comments?\/musiciansaid|community\/friends\/fans-group\/artist\/group\/get|user\/sub\/artist|music\/songshare\/text\/recommend\/get|mine\/applet\/redpoint|resniche\/position\/play\/new\/get) data="https://raw.githubusercontent.com/deezertidal/Surge_Module/master/files/reject-dict.json"
 https?:\/\/interface\d?\.music\.163.com\/w?e?api\/(search\/(chart|default|rcmd\/keyword|specialkeyword)|resource-exposure\/|activity\/bonus\/playpage\/time\/query) data="https://raw.githubusercontent.com/deezertidal/Surge_Module/master/files/reject-dict.json"
 https?:\/\/interface\d?\.music\.163.com\/eapi\/(mlivestream\/entrance\/playpage|link\/(position\/show\/strategy|scene\/show)|ios\/version|v\d\/content\/exposure\/comment\/banner) data="https://raw.githubusercontent.com/deezertidal/Surge_Module/master/files/reject-dict.json"
@@ -2051,7 +2051,7 @@ http:\/\/dili.sqcosmos.com\/jiekou\/endpage\/ad data="https://raw.githubusercont
 ^https?:\/\/iobs\.pingan\.com\.cn\/download\/bweb-per-sf-prd\/bweb data="https://raw.githubusercontent.com/deezertidal/Surge_Module/master/files/reject-200.txt"
 ^https?:\/\/interface3?\.music\.163\.com/eapi/(ad|abtest|sp|hot|store|mlog|search/(specialkeyword|defaultkeyword|hot)) data="https://raw.githubusercontent.com/deezertidal/Surge_Module/master/files/reject-img.gif"
 ^https?:\/\/interface(\d)?\.music\.163\.com\/w?eapi\/(resource-exposure\/)?activity data="https://raw.githubusercontent.com/deezertidal/Surge_Module/master/files/reject-200.txt"
-^https?:\/\/interface(\d)?\.music\.163\.com\/e?api\/vipmall\/couponcfg\/get data="https://raw.githubusercontent.com/deezertidal/Surge_Module/master/files/reject-200.txt"
+# REMOVED: ^https?:\/\/interface(\d)?\.music\.163\.com\/e?api\/vipmall\/couponcfg\/get data="https://raw.githubusercontent.com/deezertidal/Surge_Module/master/files/reject-200.txt"
 ^https?:\/\/interface(\d)?\.music\.163\.com\/e?api\/sp\/flow\/popup\/query data="https://raw.githubusercontent.com/deezertidal/Surge_Module/master/files/reject-200.txt"
 ^https?:\/\/interface(\d)?\.music\.163\.com\/e?api\/resource-exposure\/config data="https://raw.githubusercontent.com/deezertidal/Surge_Module/master/files/reject-200.txt"
 ^https?:\/\/interface(\d)?\.music\.163\.com\/e?api\/content\/activity\/music\/jar\/template\/list data="https://raw.githubusercontent.com/deezertidal/Surge_Module/master/files/reject-200.txt"
