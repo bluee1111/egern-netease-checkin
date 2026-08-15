@@ -600,7 +600,7 @@ http:\/\/ad\.myfriday\.cn\/d\/json\/1\.1 _ reject
 ^https?://issuecdn\.baidupcs\.com/issue/netdisk/guanggao _ reject
 ^https?://intl\.iqiyi\.com/video/advertise _ reject
 ^https?://intl\.iqiyi\.com/ad_external/ _ reject
-^https?://interface(\d)?.music.163.com/eapi/ad/ _ reject
+# REMOVED: ^https?://interface(\d)?.music.163.com/eapi/ad/ _ reject
 ^https?://img\d+\.10101111cdn\.com/adpos/ _ reject
 ^https?://img2\.autoimg\.cn/admdfs/ _ reject
 ^https?://imeclient\.openspeech\.cn/adservice/ _ reject
@@ -1624,7 +1624,7 @@ hostname = %APPEND% *-release.wuta-cam.com,*.1rtb.net,*.58cdn.com.cn,*.5eplay.co
 https?:\/\/res\.xiaojukeji\.com\/resapi\/activity\/get(Ruled|Preload|PasMultiNotices) data="https://raw.githubusercontent.com/deezertidal/Surge_Module/master/files/reject-200.txt"
 https?:\/\/m\.sd\.10086\.cn\/zapi\/app_common\/homeWelcome\/welcome.do data="https://raw.githubusercontent.com/deezertidal/Surge_Module/master/files/reject-200.txt"
 # REMOVED: https?:\/\/interface\d?\.music\.163\.com\/w?e?api\/(side-bar\/mini-program\/music-service\/account|delivery\/(batch-deliver|deliver)|moment\/tab\/info\/get|yunbei\/account\/entrance\/get) data="https://raw.githubusercontent.com/deezertidal/Surge_Module/master/files/reject-dict.json"
-https?:\/\/interface\d?\.music\.163\.com\/eapi\/(resource\/comments?\/musiciansaid|community\/friends\/fans-group\/artist\/group\/get|user\/sub\/artist|music\/songshare\/text\/recommend\/get|mine\/applet\/redpoint|resniche\/position\/play\/new\/get) data="https://raw.githubusercontent.com/deezertidal/Surge_Module/master/files/reject-dict.json"
+# REMOVED: https?:\/\/interface\d?\.music\.163\.com\/eapi\/(resource\/comments?\/musiciansaid|community\/friends\/fans-group\/artist\/group\/get|user\/sub\/artist|music\/songshare\/text\/recommend\/get|mine\/applet\/redpoint|resniche\/position\/play\/new\/get) data="https://raw.githubusercontent.com/deezertidal/Surge_Module/master/files/reject-dict.json"
 https?:\/\/interface\d?\.music\.163.com\/w?e?api\/(search\/(chart|default|rcmd\/keyword|specialkeyword)|resource-exposure\/|activity\/bonus\/playpage\/time\/query) data="https://raw.githubusercontent.com/deezertidal/Surge_Module/master/files/reject-dict.json"
 https?:\/\/interface\d?\.music\.163.com\/eapi\/(mlivestream\/entrance\/playpage|link\/(position\/show\/strategy|scene\/show)|ios\/version|v\d\/content\/exposure\/comment\/banner) data="https://raw.githubusercontent.com/deezertidal/Surge_Module/master/files/reject-dict.json"
 https?:\/\/helper\.2bulu\.com\/(greenPea\/queryTasks|proSpecial\/allData|saveSplashFrequencyStatistics|getPopInfo|getAppEntranceConfig|promote\/list|getSplash|outing\/reqFoundNewList|outing\/reqIndex) data="https://raw.githubusercontent.com/deezertidal/Surge_Module/master/files/reject-200.txt"
@@ -2049,13 +2049,13 @@ http:\/\/dili.sqcosmos.com\/jiekou\/endpage\/ad data="https://raw.githubusercont
 ^https?:\/\/ios-api\.lucklyworld\.com\/v6\/api\/config\/startup data="https://raw.githubusercontent.com/deezertidal/Surge_Module/master/files/reject-dict.json"
 ^https?:\/\/iobs\.pingan\.com\.cn\/download\/icore-aops-base-dmz-prd\/(YourSystemName|icore-apps-ad) data="https://raw.githubusercontent.com/deezertidal/Surge_Module/master/files/reject-200.txt"
 ^https?:\/\/iobs\.pingan\.com\.cn\/download\/bweb-per-sf-prd\/bweb data="https://raw.githubusercontent.com/deezertidal/Surge_Module/master/files/reject-200.txt"
-^https?:\/\/interface3?\.music\.163\.com/eapi/(ad|abtest|sp|hot|store|mlog|search/(specialkeyword|defaultkeyword|hot)) data="https://raw.githubusercontent.com/deezertidal/Surge_Module/master/files/reject-img.gif"
-^https?:\/\/interface(\d)?\.music\.163\.com\/w?eapi\/(resource-exposure\/)?activity data="https://raw.githubusercontent.com/deezertidal/Surge_Module/master/files/reject-200.txt"
+# REMOVED: ^https?:\/\/interface3?\.music\.163\.com/eapi/(ad|abtest|sp|hot|store|mlog|search/(specialkeyword|defaultkeyword|hot)) data="https://raw.githubusercontent.com/deezertidal/Surge_Module/master/files/reject-img.gif"
+# REMOVED: ^https?:\/\/interface(\d)?\.music\.163\.com\/w?eapi\/(resource-exposure\/)?activity data="https://raw.githubusercontent.com/deezertidal/Surge_Module/master/files/reject-200.txt"
 # REMOVED: ^https?:\/\/interface(\d)?\.music\.163\.com\/e?api\/vipmall\/couponcfg\/get data="https://raw.githubusercontent.com/deezertidal/Surge_Module/master/files/reject-200.txt"
-^https?:\/\/interface(\d)?\.music\.163\.com\/e?api\/sp\/flow\/popup\/query data="https://raw.githubusercontent.com/deezertidal/Surge_Module/master/files/reject-200.txt"
-^https?:\/\/interface(\d)?\.music\.163\.com\/e?api\/resource-exposure\/config data="https://raw.githubusercontent.com/deezertidal/Surge_Module/master/files/reject-200.txt"
-^https?:\/\/interface(\d)?\.music\.163\.com\/e?api\/content\/activity\/music\/jar\/template\/list data="https://raw.githubusercontent.com/deezertidal/Surge_Module/master/files/reject-200.txt"
-^https?:\/\/interface(\d)?\.music\.163\.com\/e?api\/comment\/feed\/inserted\/resources data="https://raw.githubusercontent.com/deezertidal/Surge_Module/master/files/reject-200.txt"
+# REMOVED: ^https?:\/\/interface(\d)?\.music\.163\.com\/e?api\/sp\/flow\/popup\/query data="https://raw.githubusercontent.com/deezertidal/Surge_Module/master/files/reject-200.txt"
+# REMOVED: ^https?:\/\/interface(\d)?\.music\.163\.com\/e?api\/resource-exposure\/config data="https://raw.githubusercontent.com/deezertidal/Surge_Module/master/files/reject-200.txt"
+# REMOVED: ^https?:\/\/interface(\d)?\.music\.163\.com\/e?api\/content\/activity\/music\/jar\/template\/list data="https://raw.githubusercontent.com/deezertidal/Surge_Module/master/files/reject-200.txt"
+# REMOVED: ^https?:\/\/interface(\d)?\.music\.163\.com\/e?api\/comment\/feed\/inserted\/resources data="https://raw.githubusercontent.com/deezertidal/Surge_Module/master/files/reject-200.txt"
 ^https?:\/\/intellicc\.bcs\.cmbchina\.com\/Edge\/api\/mlife\.intelli\.adrender\.api\.AdWork\/getAdsBySlotId data="https://raw.githubusercontent.com/deezertidal/Surge_Module/master/files/reject-dict.json"
 ^https?:\/\/info\.mina\.mi\.com\/advertise\/splash data="https://raw.githubusercontent.com/deezertidal/Surge_Module/master/files/reject-200.txt"
 ^https?:\/\/impservice\.dictapp\.youdao\.com\/imp\/request data="https://raw.githubusercontent.com/deezertidal/Surge_Module/master/files/reject-img.gif"
