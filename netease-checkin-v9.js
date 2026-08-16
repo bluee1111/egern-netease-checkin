@@ -6,8 +6,9 @@ const CAPTURE_LOCK_KEY = "netease_music_capture_in_progress";
 const ACCOUNT_URL = "https://music.163.com/api/nuser/account/get";
 const SIGN_URL = "https://music.163.com/api/point/dailyTask";
 const YUNBEI_SIGN_URL = "https://music.163.com/api/pointmall/user/sign";
-const VIP_TASK_LIST_URL = "https://music.163.com/api/vipnewcenter/app/level/task/list";
-const VIP_TASK_REWARD_URL = "https://music.163.com/api/vipnewcenter/app/level/task/reward/get";
+const VIP_SIGN_URL = "https://music.163.com/api/vip-center-bff/task/sign";
+const VIP_CHECKIN_DETAIL_URL = "https://music.163.com/api/vipnewcenter/app/level/user/checkin/history/detail";
+const VIP_REWARD_GETALL_URL = "https://music.163.com/api/vipnewcenter/app/level/task/reward/getall";
 const USER_AGENT = "Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 Mobile/15E148";
 
 function getHeader(headers, name) {
@@ -201,32 +202,35 @@ async function signYunbei(ctx, cookie) {
   return { ok: isDone(data), msg };
 }
 
-// VIP 成长值：先拉任务列表，再领取（乐签打卡）
+// VIP 成长值（黑胶乐签）v14：2026-08-17 接口改版验证
+// 旧 task/list+reward/get 已不再产出打卡任务（只剩浏览类个性化任务），旧逻辑找不到可领任务 → 假成功「无可领取项」→ 实际从未打卡
+// 新流程（有 cookie 实测 code=200）：① 打卡 task/sign(data:true) → ② 确认 checkin/history/detail(signDayTime+type=1) → ③ 一键领取 reward/getall(result:true)
 async function signVipGrowth(ctx, cookie) {
-  const list = await requestJson(ctx, VIP_TASK_LIST_URL, {
+  // ① 黑胶乐签打卡
+  const sign = await requestJson(ctx, VIP_SIGN_URL, {
     method: "POST", headers: headers(cookie, true), body: "",
   });
-  // 任务列表里找可领取的任务 id（接口异常时不再假成功）
-  const tasks = list?.data?.list || list?.data?.tasks || list?.list || list?.tasks || [];
-  const ids = [];
-  for (const t of tasks) {
-    const tid = t?.id || t?.taskId || t?.task_id || t?.userTaskId;
-    const canGet = t?.status === 1 || t?.canReceive || t?.can_receive || t?.rewardStatus === 0 || t?.done === false || t?.finish === true;
-    if (tid !== undefined && tid !== null && canGet) ids.push(String(tid));
+  const signOk = isDone(sign) && sign?.data !== false;
+  if (!signOk) {
+    return { ok: false, msg: "成长值打卡失败" + (String(sign?.message || sign?.msg || "") ? "：" + String(sign?.message || sign?.msg) : `：code=${sign?.code}`) };
   }
-  if (!ids.length) {
-    const listMsg = String(list?.message || list?.msg || "");
-    const listFake = /暂不支持|未登录|请登录|已失效|失败|异常/.test(listMsg);
-    if (listFake || !list || list.code !== 200) {
-      return { ok: false, msg: "成长值任务列表获取失败" + (listMsg ? "：" + listMsg : "") };
-    }
-    return { ok: true, msg: "成长值任务：无可领取项或已全部完成" };
-  }
-  const data = await requestJson(ctx, VIP_TASK_REWARD_URL, {
-    method: "POST", headers: headers(cookie, true), body: `taskIds=${ids.join(",")}`,
+  // ② 确认今日打卡（返回今日打卡记录即成功）
+  const detail = await requestJson(ctx, VIP_CHECKIN_DETAIL_URL, {
+    method: "POST", headers: headers(cookie, true), body: `signDayTime=${Date.now()}&type=1`,
   });
-  const msg = String(data?.message || data?.msg || (data?.code === 200 ? "成长值领取成功" : "未知响应"));
-  return { ok: isDone(data), msg };
+  const detailOk = detail?.code === 200 && Boolean(detail?.data);
+  if (!detailOk) {
+    return { ok: false, msg: "黑胶打卡确认失败：code=" + String(detail?.code) };
+  }
+  // ③ 一键领取成长值任务奖励（幂等，无可领也返回 result:true）
+  const reward = await requestJson(ctx, VIP_REWARD_GETALL_URL, {
+    method: "POST", headers: headers(cookie, true), body: "",
+  });
+  const rewardOk = reward?.code === 200 && reward?.data?.result === true;
+  return {
+    ok: true,
+    msg: rewardOk ? "成长值打卡+领取成功" : "成长值打卡成功（无待领取奖励）",
+  };
 }
 
 async function signAccount(ctx, id, item) {
